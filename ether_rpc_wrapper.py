@@ -38,3 +38,47 @@ class EtherRpcWrapper(object):
         # Return an instance of the client. Will call the __call__ method.
         log.debug('Making http request with method:%s' % name)
         return EtherRpcWrapper(self.__rpchost, self.__rpcport, name)
+
+    def __call__(self, *args):
+        """
+        Make a request to the rpc demon with the method name.
+        When the instance of the class is summoned like a function,
+        this method gets called.
+        """
+        EtherRpcWrapper.__id_count += 1
+        log.debug("-%s-> %s %s" % (EtherRpcWrapper.__id_count,
+                                   self.__rpc_call,
+                                   json.dumps(args,
+                                              default=self.EncodeDecimal)
+                                   ))
+        postdata = json.dumps({'version': '1.1',
+                               'method': self.__rpc_call,
+                               'params': args,
+                               'id': EtherRpcWrapper.__id_count
+                               },
+                              default=self.EncodeDecimal
+                              )
+        url = ''.join(['http://', self.__rpchost, ':', self.__rpcport])
+        try:
+            r = requests.post(url, data=postdata, headers=self.__headers)
+        except ConnectionError:
+            print 'There was a problem connecting to the RPC daemon.'
+            print 'Check the connection and connection parameters:'
+            error = 'Host: %s, Port: %s, Username: %s, Password: %s' \
+                % (self.__rpchost, self.__rpcport,)
+            log.error("Error connecting to rpc demon: %s" % error)
+            return ConnectionError
+        if r.status_code == 200:
+            log.debug("Response: %s" % r.json())
+            return r.json()['result']
+
+        else:
+            log.error("Error! Status code: %s" % r.status_code)
+            log.error("Text: %s" % r.text)
+            log.error("Json: %s" % r.json())
+            return r.json()
+
+        def EncodeDecimal(o):
+            if isinstance(o, decimal.Decimal):
+                return float(round(o, 8))
+            raise TypeError(repr(o) + " is not JSON serializable")
