@@ -4,6 +4,8 @@ import decimal
 from requests.exceptions import ConnectionError
 import logging
 
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 log = logging.getLogger("EtherRpc")
 
 
@@ -70,7 +72,10 @@ class EtherRpcWrapper(object):
             return ConnectionError
         if r.status_code == 200:
             log.debug("Response: %s" % r.json())
-            return r.json()['result']
+            if 'error' in r.json():
+                return r.json()
+            else:
+                return r.json()['result']
 
         else:
             log.error("Error! Status code: %s" % r.status_code)
