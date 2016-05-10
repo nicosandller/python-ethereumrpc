@@ -13,7 +13,7 @@ Install the library using pip::
 
     pip install python-ethereumrpc
 
-Example (based on python-bitcoinrpc's documentation)
+Example
 =======
 .. code:: python
 
