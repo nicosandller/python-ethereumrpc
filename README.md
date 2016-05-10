@@ -19,15 +19,6 @@ Example
 
     from ether_rpc_wrapper import EtherRpcWrapper
 
-    # rpc_user and rpc_password are set in the bitcoin.conf file
     rpc_connection = EtherRpcWrapper(rpochost, rpcport)
     best_block_hash = rpc_connection.eth_blockNumber()
-
-    // Result
-    {
-    "id":83,
-    "jsonrpc": "2.0",
-    "result": "0x4b7" // 1207
-    }
-
     print(rpc_connection.eth_getBlockByNumber(best_block_hash))
