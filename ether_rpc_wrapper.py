@@ -4,6 +4,7 @@ import decimal
 from requests.exceptions import ConnectionError
 import logging
 
+#Logger
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 log = logging.getLogger("EtherRpc")
